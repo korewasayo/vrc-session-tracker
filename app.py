@@ -26,6 +26,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  6. 👥 Group members                         [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  7. 📋 Mass ban (list of IDs)                [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  8. 📜 Audit log                             [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue]  9. 🔎 Search user (VRChat API)              [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -247,6 +248,27 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 console.print(table)
             except Exception as e:
                 console.print(f"[bold red]❌ Failed to get audit logs: {e}[/bold red]")
+
+        elif choice == "9":
+            query = console.input("[bold cyan]Enter search query for VRChat API:[/bold cyan] ")
+            try:
+                with console.status(f"[bold green]Searching API for '{query}'...[/bold green]"):
+                    results = api.search_users(query, n=20)
+                
+                if not results:
+                    console.print("[bold yellow]No users found on VRChat.[/bold yellow]")
+                    continue
+                    
+                table = Table(title=f"API Search Results for '{query}'", show_header=True, header_style="bold magenta")
+                table.add_column("User ID", style="dim", width=45)
+                table.add_column("Display Name")
+                
+                for user in results:
+                    table.add_row(user.get("id"), user.get("displayName"))
+                    
+                console.print(table)
+            except Exception as e:
+                console.print(f"[bold red]❌ Search failed: {e}[/bold red]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
