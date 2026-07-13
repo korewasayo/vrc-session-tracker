@@ -23,6 +23,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  3. ✅ Unban user                            [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  4. 👢 Kick member from group                [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  5. 🕐 Recent players (VRCX)                 [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue]  6. 👥 Group members                         [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -167,6 +168,30 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 )
             
             console.print(table)
+            
+        elif choice == "6":
+            try:
+                with console.status("[bold green]Fetching group members...[/bold green]"):
+                    members = api.get_members(n=100)
+                if not members:
+                    console.print("[bold yellow]No members found or error fetching.[/bold yellow]")
+                    continue
+                    
+                table = Table(title="Group Members (Top 100)", show_header=True, header_style="bold magenta")
+                table.add_column("User", width=30)
+                table.add_column("Role")
+                table.add_column("Joined At")
+                
+                for member in members:
+                    user = member.get("user", {})
+                    name = user.get("displayName", "Unknown")
+                    role = member.get("roleId", "Unknown")
+                    joined = utils.format_timestamp(member.get("createdAt", ""))
+                    table.add_row(name, role, joined)
+                    
+                console.print(table)
+            except Exception as e:
+                console.print(f"[bold red]❌ Failed to get members: {e}[/bold red]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
