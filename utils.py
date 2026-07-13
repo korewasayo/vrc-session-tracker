@@ -1,8 +1,5 @@
 import re
-from rich.console import Console
 from datetime import datetime
-
-console = Console()
 
 def validate_user_id(user_id):
     """Verify if the ID matches the usr_xxx format."""
@@ -13,9 +10,9 @@ def validate_group_id(group_id):
     return bool(re.match(r"^grp_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", group_id))
 
 def confirm_action(message):
-    """Display a confirmation prompt using rich."""
+    """Display a confirmation prompt."""
     while True:
-        choice = console.input(f"[bold yellow]⚠️  {message} (y/n):[/bold yellow] ").strip().lower()
+        choice = input(f"⚠️  {message} (y/n): ").strip().lower()
         if choice in ['y', 'yes']:
             return True
         if choice in ['n', 'no']:
