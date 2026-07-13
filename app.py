@@ -24,6 +24,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  4. 👢 Kick member from group                [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  5. 🕐 Recent players (VRCX)                 [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  6. 👥 Group members                         [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue]  7. 📋 Mass ban (list of IDs)                [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -192,6 +193,34 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 console.print(table)
             except Exception as e:
                 console.print(f"[bold red]❌ Failed to get members: {e}[/bold red]")
+
+        elif choice == "7":
+            console.print("[bold cyan]Enter a comma-separated list of User IDs to Ban:[/bold cyan]")
+            user_input = console.input("> ")
+            ids_to_ban = [x.strip() for x in user_input.split(",") if x.strip()]
+            
+            valid_ids = [uid for uid in ids_to_ban if utils.validate_user_id(uid)]
+            invalid_ids = [uid for uid in ids_to_ban if not utils.validate_user_id(uid)]
+            
+            if invalid_ids:
+                console.print(f"[bold yellow]⚠️ Ignored {len(invalid_ids)} invalid IDs.[/bold yellow]")
+                
+            if not valid_ids:
+                console.print("[bold red]❌ No valid User IDs provided.[/bold red]")
+                continue
+                
+            if utils.confirm_action(f"Are you sure you want to MASS BAN {len(valid_ids)} users?"):
+                success_count = 0
+                for uid in valid_ids:
+                    try:
+                        console.print(f"Banning {uid}...")
+                        api.ban_user(uid)
+                        success_count += 1
+                    except Exception as e:
+                        console.print(f"[bold red]❌ Failed to ban {uid}: {e}[/bold red]")
+                console.print(f"\n[bold green]✅ Mass ban complete. Successfully banned {success_count}/{len(valid_ids)} users.[/bold green]")
+            else:
+                console.print("[bold yellow]Mass ban cancelled.[/bold yellow]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
