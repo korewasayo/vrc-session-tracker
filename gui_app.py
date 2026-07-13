@@ -366,6 +366,9 @@ class App(ctk.CTk):
         for widget in self.log_list_frame.winfo_children():
             widget.destroy()
             
+        if isinstance(bans, dict):
+            bans = bans.get("results", [])
+            
         if not bans:
             ctk.CTkLabel(self.log_list_frame, text="No active bans found.").pack(pady=20)
             return
@@ -395,6 +398,9 @@ class App(ctk.CTk):
         self.update_status("✅ Connected", "green")
         for widget in self.log_list_frame.winfo_children():
             widget.destroy()
+            
+        if isinstance(logs, dict):
+            logs = logs.get("results", [])
             
         if not logs:
             ctk.CTkLabel(self.log_list_frame, text="No audit logs found.").pack(pady=20)
