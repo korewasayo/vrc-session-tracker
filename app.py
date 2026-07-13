@@ -27,6 +27,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  7. 📋 Mass ban (list of IDs)                [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  8. 📜 Audit log                             [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  9. 🔎 Search user (VRChat API)              [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue] 10. 🚫 Active bans                           [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -269,6 +270,28 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 console.print(table)
             except Exception as e:
                 console.print(f"[bold red]❌ Search failed: {e}[/bold red]")
+
+        elif choice == "10":
+            try:
+                with console.status("[bold green]Fetching active bans...[/bold green]"):
+                    bans = api.get_bans(n=100)
+                if not bans:
+                    console.print("[bold yellow]No active bans found or error fetching.[/bold yellow]")
+                    continue
+                    
+                table = Table(title="Active Bans (Top 100)", show_header=True, header_style="bold magenta")
+                table.add_column("User", width=30)
+                table.add_column("Banned At")
+                
+                for ban in bans:
+                    user = ban.get("user", {})
+                    name = user.get("displayName", ban.get("userId", "Unknown"))
+                    banned_at = utils.format_timestamp(ban.get("createdAt", ""))
+                    table.add_row(name, banned_at)
+                    
+                console.print(table)
+            except Exception as e:
+                console.print(f"[bold red]❌ Failed to get bans: {e}[/bold red]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
