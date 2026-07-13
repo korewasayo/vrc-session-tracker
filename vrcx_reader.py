@@ -35,41 +35,31 @@ class VRCXReader:
 
     def get_known_players(self, limit=100):
         """Return a list of unique known players."""
-        # VRCX generally stores detailed data in 'gamelog_player' or inside 'data' in 'gamelog'
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                
-                # Attempt 1: Check if gamelog table exists
-                # We use a generic query in case the exact schema is unknown
-                # (VRCX usually uses 'user' or 'gamelog' tables)
                 tables = self.get_tables()
-                if "gamelog" in tables:
+                if "gamelog_join_leave" in tables:
                     cursor.execute("""
-                        SELECT data, created_at 
-                        FROM gamelog 
-                        WHERE type IN ('OnPlayerJoined', 'OnPlayerLeft') 
+                        SELECT user_id, display_name, created_at 
+                        FROM gamelog_join_leave 
+                        WHERE user_id IS NOT NULL AND display_name IS NOT NULL
                         ORDER BY created_at DESC 
                         LIMIT ?
                     """, (limit * 10,)) # Search more rows because we need unique ones
                     
                     players = {}
                     for row in cursor.fetchall():
-                        try:
-                            data = json.loads(row["data"])
-                            user_id = data.get("userId") or data.get("user", {}).get("id")
-                            display_name = data.get("displayName") or data.get("user", {}).get("displayName")
-                            
-                            if user_id and display_name and user_id not in players:
-                                players[user_id] = {
-                                    "userId": user_id,
-                                    "displayName": display_name,
-                                    "last_seen": row["created_at"]
-                                }
-                            if len(players) >= limit:
-                                break
-                        except json.JSONDecodeError:
-                            continue
+                        user_id = row["user_id"]
+                        display_name = row["display_name"]
+                        if user_id not in players:
+                            players[user_id] = {
+                                "userId": user_id,
+                                "displayName": display_name,
+                                "last_seen": row["created_at"]
+                            }
+                        if len(players) >= limit:
+                            break
                             
                     return list(players.values())
         except sqlite3.Error as e:
@@ -85,31 +75,24 @@ class VRCXReader:
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                # Verify existence of gamelog
-                if "gamelog" in self.get_tables():
+                if "gamelog_join_leave" in self.get_tables():
                     cursor.execute("""
-                        SELECT data, created_at 
-                        FROM gamelog 
-                        WHERE type IN ('OnPlayerJoined', 'OnPlayerLeft') 
-                        AND created_at >= ?
+                        SELECT user_id, display_name, created_at 
+                        FROM gamelog_join_leave 
+                        WHERE created_at >= ? AND user_id IS NOT NULL AND display_name IS NOT NULL
                         ORDER BY created_at DESC
                     """, (cutoff_str,))
                     
                     players_map = {}
                     for row in cursor.fetchall():
-                        try:
-                            data = json.loads(row["data"])
-                            user_id = data.get("userId") or data.get("user", {}).get("id")
-                            display_name = data.get("displayName") or data.get("user", {}).get("displayName")
-                            
-                            if user_id and display_name and user_id not in players_map:
-                                players_map[user_id] = {
-                                    "userId": user_id,
-                                    "displayName": display_name,
-                                    "last_seen": row["created_at"]
-                                }
-                        except json.JSONDecodeError:
-                            continue
+                        user_id = row["user_id"]
+                        display_name = row["display_name"]
+                        if user_id not in players_map:
+                            players_map[user_id] = {
+                                "userId": user_id,
+                                "displayName": display_name,
+                                "last_seen": row["created_at"]
+                            }
                     
                     recent_players = list(players_map.values())
         except sqlite3.Error:
@@ -124,30 +107,24 @@ class VRCXReader:
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                if "gamelog" in self.get_tables():
+                if "gamelog_join_leave" in self.get_tables():
                     cursor.execute("""
-                        SELECT data, created_at 
-                        FROM gamelog 
-                        WHERE type IN ('OnPlayerJoined', 'OnPlayerLeft')
-                        AND data LIKE ?
+                        SELECT user_id, display_name, created_at 
+                        FROM gamelog_join_leave 
+                        WHERE display_name LIKE ? AND user_id IS NOT NULL
                         ORDER BY created_at DESC
                         LIMIT 500
                     """, (f"%{name}%",))
                     
                     for row in cursor.fetchall():
-                        try:
-                            data = json.loads(row["data"])
-                            user_id = data.get("userId") or data.get("user", {}).get("id")
-                            display_name = data.get("displayName") or data.get("user", {}).get("displayName")
-                            
-                            if user_id and display_name and name_lower in display_name.lower() and user_id not in results:
-                                results[user_id] = {
-                                    "userId": user_id,
-                                    "displayName": display_name,
-                                    "last_seen": row["created_at"]
-                                }
-                        except json.JSONDecodeError:
-                            continue
+                        user_id = row["user_id"]
+                        display_name = row["display_name"]
+                        if user_id not in results:
+                            results[user_id] = {
+                                "userId": user_id,
+                                "displayName": display_name,
+                                "last_seen": row["created_at"]
+                            }
         except sqlite3.Error:
             pass
             
@@ -159,27 +136,20 @@ class VRCXReader:
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                if "gamelog" in self.get_tables():
+                if "gamelog_join_leave" in self.get_tables():
                     cursor.execute("""
-                        SELECT type, data, created_at 
-                        FROM gamelog 
-                        WHERE type IN ('OnPlayerJoined', 'OnPlayerLeft')
-                        AND data LIKE ?
+                        SELECT type, created_at, location 
+                        FROM gamelog_join_leave 
+                        WHERE user_id = ?
                         ORDER BY created_at DESC
-                    """, (f"%{user_id}%",))
+                    """, (user_id,))
                     
                     for row in cursor.fetchall():
-                        try:
-                            data = json.loads(row["data"])
-                            row_user_id = data.get("userId") or data.get("user", {}).get("id")
-                            if row_user_id == user_id:
-                                history.append({
-                                    "action": row["type"],
-                                    "timestamp": row["created_at"],
-                                    "location": data.get("location", "Unknown")
-                                })
-                        except json.JSONDecodeError:
-                            continue
+                        history.append({
+                            "action": row["type"],
+                            "timestamp": row["created_at"],
+                            "location": row["location"] or "Unknown"
+                        })
         except sqlite3.Error:
             pass
             
