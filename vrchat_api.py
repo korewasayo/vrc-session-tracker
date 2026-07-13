@@ -64,3 +64,25 @@ class VRChatAPI:
         if not self.group_id:
             raise ValueError("No group ID configured.")
         return self._request("GET", f"/groups/{self.group_id}")
+
+    def get_user_info(self, user_id):
+        """Get information about a specific user."""
+        return self._request("GET", f"/users/{user_id}")
+
+    def ban_user(self, user_id):
+        """Ban a user from the configured group."""
+        if not self.group_id:
+            raise ValueError("No group ID configured.")
+        return self._request("POST", f"/groups/{self.group_id}/bans", json={"userId": user_id})
+
+    def unban_user(self, user_id):
+        """Unban a user from the configured group."""
+        if not self.group_id:
+            raise ValueError("No group ID configured.")
+        return self._request("DELETE", f"/groups/{self.group_id}/bans/{user_id}")
+
+    def kick_member(self, user_id):
+        """Kick a member from the configured group."""
+        if not self.group_id:
+            raise ValueError("No group ID configured.")
+        return self._request("DELETE", f"/groups/{self.group_id}/members/{user_id}")
