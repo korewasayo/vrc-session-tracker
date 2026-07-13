@@ -25,6 +25,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  5. 🕐 Recent players (VRCX)                 [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  6. 👥 Group members                         [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  7. 📋 Mass ban (list of IDs)                [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue]  8. 📜 Audit log                             [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -221,6 +222,31 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 console.print(f"\n[bold green]✅ Mass ban complete. Successfully banned {success_count}/{len(valid_ids)} users.[/bold green]")
             else:
                 console.print("[bold yellow]Mass ban cancelled.[/bold yellow]")
+
+        elif choice == "8":
+            try:
+                with console.status("[bold green]Fetching audit logs...[/bold green]"):
+                    logs = api.get_audit_logs(n=50)
+                if not logs:
+                    console.print("[bold yellow]No audit logs found.[/bold yellow]")
+                    continue
+                    
+                table = Table(title="Audit Logs (Last 50)", show_header=True, header_style="bold magenta")
+                table.add_column("Time", width=20)
+                table.add_column("Actor", width=20)
+                table.add_column("Action", width=20)
+                table.add_column("Target")
+                
+                for log in logs:
+                    time = utils.format_timestamp(log.get("created_at", ""))
+                    actor = log.get("actorDisplayName", "Unknown")
+                    action = log.get("eventType", "Unknown")
+                    target = log.get("targetId", "Unknown")
+                    table.add_row(time, actor, action, target)
+                    
+                console.print(table)
+            except Exception as e:
+                console.print(f"[bold red]❌ Failed to get audit logs: {e}[/bold red]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
