@@ -7,6 +7,8 @@ from rich.table import Table
 from vrchat_api import VRChatAPI
 from vrcx_reader import VRCXReader
 import utils
+import logger
+import time
 
 console = Console()
 
@@ -28,6 +30,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
         console.print(f"[bold blue]║[/bold blue]  8. 📜 Audit log                             [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  9. 🔎 Search user (VRChat API)              [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue] 10. 🚫 Active bans                           [bold blue]║[/bold blue]")
+        console.print(f"[bold blue]║[/bold blue] 11. 💾 Export recent players to CSV          [bold blue]║[/bold blue]")
         console.print(f"[bold blue]║[/bold blue]  0. ❌ Exit                                  [bold blue]║[/bold blue]")
         console.print(f"[bold blue]╚══════════════════════════════════════════════╝[/bold blue]")
         
@@ -87,6 +90,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 try:
                     with console.status(f"[bold red]Banning {target_name}...[/bold red]"):
                         api.ban_user(target_id)
+                    logger.log_action("BAN", target_id, target_name)
                     console.print(f"[bold green]✅ Successfully banned {target_name}.[/bold green]")
                 except Exception as e:
                     console.print(f"[bold red]❌ Failed to ban: {e}[/bold red]")
@@ -103,6 +107,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 try:
                     with console.status("[bold green]Unbanning user...[/bold green]"):
                         api.unban_user(user_input)
+                    logger.log_action("UNBAN", user_input)
                     console.print(f"[bold green]✅ Successfully unbanned user.[/bold green]")
                 except Exception as e:
                     console.print(f"[bold red]❌ Failed to unban: {e}[/bold red]")
@@ -141,6 +146,7 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 try:
                     with console.status(f"[bold yellow]Kicking {target_name}...[/bold yellow]"):
                         api.kick_member(target_id)
+                    logger.log_action("KICK", target_id, target_name)
                     console.print(f"[bold green]✅ Successfully kicked {target_name}.[/bold green]")
                 except Exception as e:
                     console.print(f"[bold red]❌ Failed to kick: {e}[/bold red]")
@@ -218,7 +224,11 @@ def show_menu(console, api, vrcx, group_name, display_name):
                     try:
                         console.print(f"Banning {uid}...")
                         api.ban_user(uid)
+                        logger.log_action("BAN", uid)
                         success_count += 1
+                        if uid != valid_ids[-1]:
+                            console.print("[dim]Sleeping 1s to respect rate limits...[/dim]")
+                            time.sleep(1)
                     except Exception as e:
                         console.print(f"[bold red]❌ Failed to ban {uid}: {e}[/bold red]")
                 console.print(f"\n[bold green]✅ Mass ban complete. Successfully banned {success_count}/{len(valid_ids)} users.[/bold green]")
@@ -292,11 +302,29 @@ def show_menu(console, api, vrcx, group_name, display_name):
                 console.print(table)
             except Exception as e:
                 console.print(f"[bold red]❌ Failed to get bans: {e}[/bold red]")
+
+        elif choice == "11":
+            if not vrcx:
+                console.print("[bold red]❌ VRCX is not connected.[/bold red]")
+                continue
+                
+            with console.status("[bold green]Reading history...[/bold green]"):
+                recent = vrcx.get_recent_players(hours=24)
+                
+            if not recent:
+                console.print("[bold yellow]No players found in the last 24h to export.[/bold yellow]")
+                continue
+                
+            filename = f"recent_players_{int(time.time())}.csv"
+            if logger.export_recent_players_to_csv(recent, filename):
+                console.print(f"[bold green]✅ Successfully exported {len(recent)} players to {filename}[/bold green]")
+            else:
+                console.print("[bold red]❌ Failed to export.[/bold red]")
         else:
             console.print("[bold red]❌ Invalid option![/bold red]")
 
 def main():
-    console.print(Panel.fit("[bold blue]🛡️ VRChat Group Moderation Tool - v0.3[/bold blue]", border_style="blue"))
+    console.print(Panel.fit("[bold blue]🛡️ VRChat Group Moderation Tool - v0.5[/bold blue]", border_style="blue"))
     
     # Load .env
     load_dotenv()
@@ -337,7 +365,7 @@ def main():
                 console.print(f"⚠️ Warning: Could not connect to VRCX ({str(e)})")
                 vrcx = None
         
-        console.print("\n[bold cyan]✨ v0.3 Initialization Complete![/bold cyan]")
+        console.print("\n[bold cyan]✨ v0.5 Initialization Complete![/bold cyan]")
         
         # Start interactive menu
         show_menu(console, api, vrcx, group_name, display_name)
