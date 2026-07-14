@@ -19,7 +19,7 @@ class App(ctk.CTk):
         super().__init__()
         self.title("VRChat Group Moderation Tool v1.0")
         self.geometry("900x750")
-        self.configure(fg_color="#160F24")
+        self.configure(fg_color="#0F0A1A")
 
         # Layout
         self.grid_columnconfigure(1, weight=1)
@@ -27,23 +27,23 @@ class App(ctk.CTk):
         self.grid_rowconfigure(1, weight=0, minsize=150)
 
         # Sidebar
-        self.sidebar_frame = ctk.CTkFrame(self, width=200, corner_radius=0, fg_color="#1D1430")
+        self.sidebar_frame = ctk.CTkFrame(self, width=200, corner_radius=0, fg_color="#160F26")
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(5, weight=1)
         
         # Sidebar Border
-        self.sidebar_border = ctk.CTkFrame(self, width=2, fg_color="#8A2BE2", corner_radius=0)
+        self.sidebar_border = ctk.CTkFrame(self, width=2, fg_color="#7C3AED", corner_radius=0)
         self.sidebar_border.grid(row=0, column=0, sticky="nse")
 
-        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="🛡️ VRC Mod Tool", font=ctk.CTkFont(size=20, weight="bold"), text_color="#B785F6")
+        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="🛡️ VRC Mod Tool", font=ctk.CTkFont(size=20, weight="bold"), text_color="#A78BFA")
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
         btn_style = {
             "fg_color": "transparent",
-            "hover_color": "#2D1E4A",
-            "text_color": "#E8E0FF",
+            "hover_color": "#1F1433",
+            "text_color": "#F5F3FF",
             "border_width": 1,
-            "border_color": "#8A2BE2",
+            "border_color": "#7C3AED",
             "corner_radius": 6
         }
 
@@ -70,13 +70,13 @@ class App(ctk.CTk):
         self.main_frame.grid_rowconfigure(0, weight=1)
         
         # Console Panel
-        self.console_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="#0A0A0A", border_width=1, border_color="#452E75")
+        self.console_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="#0A0A0A", border_width=1, border_color="#4C1D95")
         self.console_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
         
-        self.console_header = ctk.CTkFrame(self.console_frame, corner_radius=0, fg_color="#1D1430", height=24)
+        self.console_header = ctk.CTkFrame(self.console_frame, corner_radius=0, fg_color="#160F26", height=24)
         self.console_header.pack(fill="x")
         ctk.CTkLabel(self.console_header, text="⌨ CONSOLE", font=("Consolas", 12, "bold"), text_color="#00FF41").pack(side="left", padx=10)
-        ctk.CTkButton(self.console_header, text="Clear", font=("Consolas", 10, "bold"), width=50, height=20, fg_color="transparent", hover_color="#2D1E4A", text_color="#00FF41", command=self.clear_console).pack(side="right", padx=10)
+        ctk.CTkButton(self.console_header, text="Clear", font=("Consolas", 10, "bold"), width=50, height=20, fg_color="transparent", hover_color="#1F1433", text_color="#00FF41", command=self.clear_console).pack(side="right", padx=10)
 
         self.console_textbox = ctk.CTkTextbox(self.console_frame, fg_color="#0A0A0A", text_color="#00FF41", font=("Consolas", 12))
         self.console_textbox.pack(fill="both", expand=True, padx=5, pady=5)
@@ -119,7 +119,7 @@ class App(ctk.CTk):
             self.log_to_console("ERROR: Missing .env configuration.")
             return
 
-        self.update_status("Connecting to API...", "#E8E0FF")
+        self.update_status("Connecting to API...", "#F5F3FF")
         self.log_to_console("Connecting to VRChat API...")
         try:
             self.api = VRChatAPI()
@@ -131,7 +131,7 @@ class App(ctk.CTk):
             
             self.log_to_console(f"Connected as {self.display_name} | Group: {self.group_name}")
             
-            self.update_status("Connecting to VRCX...", "#E8E0FF")
+            self.update_status("Connecting to VRCX...", "#F5F3FF")
             self.log_to_console("Connecting to VRCX Database...")
             try:
                 self.vrcx = VRCXReader()
@@ -150,7 +150,7 @@ class App(ctk.CTk):
             self.log_to_console(f"ERROR: API Connection Failed: {e}")
             messagebox.showerror("Error", f"Failed to initialize: {e}")
 
-    def update_status(self, text, color="#E8E0FF"):
+    def update_status(self, text, color="#F5F3FF"):
         self.after(0, lambda: self.status_label.configure(text=text, text_color=color))
 
     def clear_main_frame(self):
@@ -159,14 +159,14 @@ class App(ctk.CTk):
 
     def show_dashboard(self):
         self.clear_main_frame()
-        title = ctk.CTkLabel(self.main_frame, text="Dashboard", font=ctk.CTkFont(size=24, weight="bold"), text_color="#E8E0FF")
+        title = ctk.CTkLabel(self.main_frame, text="Dashboard", font=ctk.CTkFont(size=24, weight="bold"), text_color="#F5F3FF")
         title.pack(pady=20, padx=20, anchor="w")
         
-        info_frame = ctk.CTkFrame(self.main_frame, fg_color="#2D1E4A", corner_radius=10)
+        info_frame = ctk.CTkFrame(self.main_frame, fg_color="#1F1433", corner_radius=10)
         info_frame.pack(pady=10, padx=20, fill="x")
         
-        ctk.CTkLabel(info_frame, text=f"Logged in as: {self.display_name}", font=("Arial", 16), text_color="#E8E0FF").pack(pady=10, padx=10, anchor="w")
-        ctk.CTkLabel(info_frame, text=f"Managing Group: {self.group_name}", font=("Arial", 16), text_color="#E8E0FF").pack(pady=10, padx=10, anchor="w")
+        ctk.CTkLabel(info_frame, text=f"Logged in as: {self.display_name}", font=("Arial", 16), text_color="#F5F3FF").pack(pady=10, padx=10, anchor="w")
+        ctk.CTkLabel(info_frame, text=f"Managing Group: {self.group_name}", font=("Arial", 16), text_color="#F5F3FF").pack(pady=10, padx=10, anchor="w")
         
         vrcx_status = "Connected" if self.vrcx else "Not Found"
         vrcx_color = "#00FF41" if self.vrcx else "#FF3366"
@@ -175,7 +175,7 @@ class App(ctk.CTk):
 
     def show_vrcx(self):
         self.clear_main_frame()
-        title = ctk.CTkLabel(self.main_frame, text="VRCX Recent Players", font=ctk.CTkFont(size=24, weight="bold"), text_color="#E8E0FF")
+        title = ctk.CTkLabel(self.main_frame, text="VRCX Recent Players", font=ctk.CTkFont(size=24, weight="bold"), text_color="#F5F3FF")
         title.pack(pady=(20, 10), padx=20, anchor="w")
         
         if not self.vrcx:
@@ -186,41 +186,41 @@ class App(ctk.CTk):
         btn_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         btn_frame.pack(fill="x", padx=20, pady=10)
         
-        btn_export = ctk.CTkButton(btn_frame, text="Export to CSV", fg_color="#8A2BE2", hover_color="#6B1FB3", text_color="#E8E0FF", command=self.export_vrcx_csv)
+        btn_export = ctk.CTkButton(btn_frame, text="Export to CSV", fg_color="#7C3AED", hover_color="#6D28D9", text_color="#F5F3FF", command=self.export_vrcx_csv)
         btn_export.pack(side="left")
         
-        self.vrcx_list_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#2D1E4A", corner_radius=10)
+        self.vrcx_list_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#1F1433", corner_radius=10)
         self.vrcx_list_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Header
         header_font = ctk.CTkFont(weight="bold")
-        ctk.CTkLabel(self.vrcx_list_frame, text="Display Name", font=header_font, text_color="#A794D4", width=200, anchor="w").grid(row=0, column=0, padx=10, pady=5)
-        ctk.CTkLabel(self.vrcx_list_frame, text="User ID", font=header_font, text_color="#A794D4", width=300, anchor="w").grid(row=0, column=1, padx=10, pady=5)
-        ctk.CTkLabel(self.vrcx_list_frame, text="Last Seen", font=header_font, text_color="#A794D4", width=150, anchor="w").grid(row=0, column=2, padx=10, pady=5)
+        ctk.CTkLabel(self.vrcx_list_frame, text="Display Name", font=header_font, text_color="#C4B5FD", width=200, anchor="w").grid(row=0, column=0, padx=10, pady=5)
+        ctk.CTkLabel(self.vrcx_list_frame, text="User ID", font=header_font, text_color="#C4B5FD", width=300, anchor="w").grid(row=0, column=1, padx=10, pady=5)
+        ctk.CTkLabel(self.vrcx_list_frame, text="Last Seen", font=header_font, text_color="#C4B5FD", width=150, anchor="w").grid(row=0, column=2, padx=10, pady=5)
         
         self.log_to_console("Loading VRCX players...")
         threading.Thread(target=self._load_vrcx_data, daemon=True).start()
 
     def _load_vrcx_data(self):
-        self.update_status("Loading VRCX data...", "#E8E0FF")
+        self.update_status("Loading VRCX data...", "#F5F3FF")
         recent = self.vrcx.get_recent_players(hours=24)
         self.after(0, self._render_vrcx_data, recent)
         
     def _render_vrcx_data(self, recent):
         self.update_status("✅ Connected", "#00FF41")
         if not recent:
-            ctk.CTkLabel(self.vrcx_list_frame, text="No players found in the last 24h.", text_color="#E8E0FF").grid(row=1, column=0, columnspan=3, pady=20)
+            ctk.CTkLabel(self.vrcx_list_frame, text="No players found in the last 24h.", text_color="#F5F3FF").grid(row=1, column=0, columnspan=3, pady=20)
             self.log_to_console("VRCX loaded: 0 players found.")
             return
             
         for i, player in enumerate(recent[:100], start=1):
-            ctk.CTkLabel(self.vrcx_list_frame, text=player["displayName"], text_color="#E8E0FF", width=200, anchor="w").grid(row=i, column=0, padx=10, pady=2)
-            id_entry = ctk.CTkEntry(self.vrcx_list_frame, width=300, fg_color="transparent", text_color="#E8E0FF", border_width=0)
+            ctk.CTkLabel(self.vrcx_list_frame, text=player["displayName"], text_color="#F5F3FF", width=200, anchor="w").grid(row=i, column=0, padx=10, pady=2)
+            id_entry = ctk.CTkEntry(self.vrcx_list_frame, width=300, fg_color="transparent", text_color="#F5F3FF", border_width=0)
             id_entry.insert(0, player["userId"])
             id_entry.configure(state="readonly")
             id_entry.grid(row=i, column=1, padx=10, pady=2)
             ts = utils.format_timestamp(player["last_seen"])
-            ctk.CTkLabel(self.vrcx_list_frame, text=ts, text_color="#E8E0FF", width=150, anchor="w").grid(row=i, column=2, padx=10, pady=2)
+            ctk.CTkLabel(self.vrcx_list_frame, text=ts, text_color="#F5F3FF", width=150, anchor="w").grid(row=i, column=2, padx=10, pady=2)
             
         self.log_to_console(f"VRCX loaded: {len(recent)} players found.")
 
@@ -238,33 +238,33 @@ class App(ctk.CTk):
 
     def show_moderation(self):
         self.clear_main_frame()
-        title = ctk.CTkLabel(self.main_frame, text="Moderation Panel", font=ctk.CTkFont(size=24, weight="bold"), text_color="#E8E0FF")
+        title = ctk.CTkLabel(self.main_frame, text="Moderation Panel", font=ctk.CTkFont(size=24, weight="bold"), text_color="#F5F3FF")
         title.pack(pady=(20, 10), padx=20, anchor="w")
         
         # Single User Action Frame
-        single_frame = ctk.CTkFrame(self.main_frame, fg_color="#2D1E4A", corner_radius=10)
+        single_frame = ctk.CTkFrame(self.main_frame, fg_color="#1F1433", corner_radius=10)
         single_frame.pack(fill="x", padx=20, pady=10)
         
-        ctk.CTkLabel(single_frame, text="User ID or Display Name:", font=ctk.CTkFont(weight="bold"), text_color="#E8E0FF").pack(pady=(10, 0), padx=10, anchor="w")
+        ctk.CTkLabel(single_frame, text="User ID or Display Name:", font=ctk.CTkFont(weight="bold"), text_color="#F5F3FF").pack(pady=(10, 0), padx=10, anchor="w")
         
-        self.mod_user_entry = ctk.CTkEntry(single_frame, width=400, placeholder_text="usr_... or Exact Name", fg_color="#160F24", border_color="#8A2BE2", text_color="#E8E0FF")
+        self.mod_user_entry = ctk.CTkEntry(single_frame, width=400, placeholder_text="usr_... or Exact Name", fg_color="#0F0A1A", border_color="#7C3AED", text_color="#F5F3FF")
         self.mod_user_entry.pack(pady=10, padx=10, anchor="w")
         
         btn_row = ctk.CTkFrame(single_frame, fg_color="transparent")
         btn_row.pack(fill="x", padx=10, pady=(0, 10))
         
-        ctk.CTkButton(btn_row, text="🔎 Search API", width=100, fg_color="#8A2BE2", hover_color="#6B1FB3", text_color="#E8E0FF", command=self.action_search).pack(side="left", padx=5)
+        ctk.CTkButton(btn_row, text="🔎 Search API", width=100, fg_color="#7C3AED", hover_color="#6D28D9", text_color="#F5F3FF", command=self.action_search).pack(side="left", padx=5)
         ctk.CTkButton(btn_row, text="🚫 Ban", width=100, fg_color="#FF1744", hover_color="#D50000", text_color="#FFFFFF", command=self.action_ban).pack(side="left", padx=5)
         ctk.CTkButton(btn_row, text="👢 Kick", width=100, fg_color="#FF6D00", hover_color="#E65100", text_color="#FFFFFF", command=self.action_kick).pack(side="left", padx=5)
         ctk.CTkButton(btn_row, text="✅ Unban", width=100, fg_color="#00E676", hover_color="#00C853", text_color="#000000", command=self.action_unban).pack(side="left", padx=5)
         
         # Mass Ban Frame
-        mass_frame = ctk.CTkFrame(self.main_frame, fg_color="#2D1E4A", corner_radius=10)
+        mass_frame = ctk.CTkFrame(self.main_frame, fg_color="#1F1433", corner_radius=10)
         mass_frame.pack(fill="both", expand=True, padx=20, pady=10)
         
-        ctk.CTkLabel(mass_frame, text="Mass Ban (Comma-separated User IDs):", font=ctk.CTkFont(weight="bold"), text_color="#E8E0FF").pack(pady=(10, 0), padx=10, anchor="w")
+        ctk.CTkLabel(mass_frame, text="Mass Ban (Comma-separated User IDs):", font=ctk.CTkFont(weight="bold"), text_color="#F5F3FF").pack(pady=(10, 0), padx=10, anchor="w")
         
-        self.mass_ban_textbox = ctk.CTkTextbox(mass_frame, height=100, fg_color="#0A0A0A", text_color="#00FF41", font=("Consolas", 12), border_width=1, border_color="#8A2BE2")
+        self.mass_ban_textbox = ctk.CTkTextbox(mass_frame, height=100, fg_color="#0A0A0A", text_color="#00FF41", font=("Consolas", 12), border_width=1, border_color="#7C3AED")
         self.mass_ban_textbox.pack(fill="both", expand=True, padx=10, pady=10)
         
         ctk.CTkButton(mass_frame, text="📋 Execute Mass Ban", fg_color="#FF1744", hover_color="#D50000", text_color="#FFFFFF", command=self.action_mass_ban).pack(pady=(0, 10), padx=10, anchor="e")
@@ -292,7 +292,7 @@ class App(ctk.CTk):
         threading.Thread(target=self._async_search, args=(query,), daemon=True).start()
         
     def _async_search(self, query):
-        self.update_status("Searching API...", "#E8E0FF")
+        self.update_status("Searching API...", "#F5F3FF")
         try:
             results = self.api.search_users(query, n=10)
             self.update_status("✅ Connected", "#00FF41")
@@ -431,21 +431,21 @@ class App(ctk.CTk):
 
     def show_logs(self):
         self.clear_main_frame()
-        title = ctk.CTkLabel(self.main_frame, text="Logs & Bans", font=ctk.CTkFont(size=24, weight="bold"), text_color="#E8E0FF")
+        title = ctk.CTkLabel(self.main_frame, text="Logs & Bans", font=ctk.CTkFont(size=24, weight="bold"), text_color="#F5F3FF")
         title.pack(pady=(20, 10), padx=20, anchor="w")
         
         btn_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         btn_frame.pack(fill="x", padx=20, pady=5)
         
-        ctk.CTkButton(btn_frame, text="Load Active Bans", fg_color="#8A2BE2", hover_color="#6B1FB3", text_color="#E8E0FF", command=lambda: threading.Thread(target=self._load_bans, daemon=True).start()).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Load Audit Logs", fg_color="#8A2BE2", hover_color="#6B1FB3", text_color="#E8E0FF", command=lambda: threading.Thread(target=self._load_audit, daemon=True).start()).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text="Load Active Bans", fg_color="#7C3AED", hover_color="#6D28D9", text_color="#F5F3FF", command=lambda: threading.Thread(target=self._load_bans, daemon=True).start()).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text="Load Audit Logs", fg_color="#7C3AED", hover_color="#6D28D9", text_color="#F5F3FF", command=lambda: threading.Thread(target=self._load_audit, daemon=True).start()).pack(side="left", padx=5)
         
-        self.log_list_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#2D1E4A", corner_radius=10)
+        self.log_list_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#1F1433", corner_radius=10)
         self.log_list_frame.pack(fill="both", expand=True, padx=20, pady=(10, 20))
         self.log_to_console("Logs & Bans panel loaded.")
         
     def _load_bans(self):
-        self.update_status("Loading Active Bans...", "#E8E0FF")
+        self.update_status("Loading Active Bans...", "#F5F3FF")
         self.log_to_console("LOGS > Fetching active bans...")
         try:
             bans = self.api.get_bans(n=100)
@@ -464,26 +464,26 @@ class App(ctk.CTk):
             bans = bans.get("results", [])
             
         if not bans:
-            ctk.CTkLabel(self.log_list_frame, text="No active bans found.", text_color="#E8E0FF").pack(pady=20)
+            ctk.CTkLabel(self.log_list_frame, text="No active bans found.", text_color="#F5F3FF").pack(pady=20)
             self.log_to_console("LOGS > 0 active bans found.")
             return
             
         header_font = ctk.CTkFont(weight="bold")
-        ctk.CTkLabel(self.log_list_frame, text="Target Name / ID", font=header_font, text_color="#A794D4", width=300, anchor="w").grid(row=0, column=0, padx=10, pady=5)
-        ctk.CTkLabel(self.log_list_frame, text="Banned At", font=header_font, text_color="#A794D4", width=200, anchor="w").grid(row=0, column=1, padx=10, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Target Name / ID", font=header_font, text_color="#C4B5FD", width=300, anchor="w").grid(row=0, column=0, padx=10, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Banned At", font=header_font, text_color="#C4B5FD", width=200, anchor="w").grid(row=0, column=1, padx=10, pady=5)
         
         for i, ban in enumerate(bans, start=1):
             user = ban.get("user", {})
             name = user.get("displayName", ban.get("userId", "Unknown"))
             banned_at = utils.format_timestamp(ban.get("createdAt", ""))
             
-            ctk.CTkLabel(self.log_list_frame, text=name, text_color="#E8E0FF", width=300, anchor="w").grid(row=i, column=0, padx=10, pady=2)
-            ctk.CTkLabel(self.log_list_frame, text=banned_at, text_color="#E8E0FF", width=200, anchor="w").grid(row=i, column=1, padx=10, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=name, text_color="#F5F3FF", width=300, anchor="w").grid(row=i, column=0, padx=10, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=banned_at, text_color="#F5F3FF", width=200, anchor="w").grid(row=i, column=1, padx=10, pady=2)
             
         self.log_to_console(f"LOGS > Loaded {len(bans)} active bans.")
 
     def _load_audit(self):
-        self.update_status("Loading Audit Logs...", "#E8E0FF")
+        self.update_status("Loading Audit Logs...", "#F5F3FF")
         self.log_to_console("LOGS > Fetching audit logs...")
         try:
             logs = self.api.get_audit_logs(n=50)
@@ -502,15 +502,15 @@ class App(ctk.CTk):
             logs = logs.get("results", [])
             
         if not logs:
-            ctk.CTkLabel(self.log_list_frame, text="No audit logs found.", text_color="#E8E0FF").pack(pady=20)
+            ctk.CTkLabel(self.log_list_frame, text="No audit logs found.", text_color="#F5F3FF").pack(pady=20)
             self.log_to_console("LOGS > 0 audit logs found.")
             return
             
         header_font = ctk.CTkFont(weight="bold")
-        ctk.CTkLabel(self.log_list_frame, text="Time", font=header_font, text_color="#A794D4", width=150, anchor="w").grid(row=0, column=0, padx=5, pady=5)
-        ctk.CTkLabel(self.log_list_frame, text="Actor", font=header_font, text_color="#A794D4", width=150, anchor="w").grid(row=0, column=1, padx=5, pady=5)
-        ctk.CTkLabel(self.log_list_frame, text="Action", font=header_font, text_color="#A794D4", width=150, anchor="w").grid(row=0, column=2, padx=5, pady=5)
-        ctk.CTkLabel(self.log_list_frame, text="Target", font=header_font, text_color="#A794D4", width=200, anchor="w").grid(row=0, column=3, padx=5, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Time", font=header_font, text_color="#C4B5FD", width=150, anchor="w").grid(row=0, column=0, padx=5, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Actor", font=header_font, text_color="#C4B5FD", width=150, anchor="w").grid(row=0, column=1, padx=5, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Action", font=header_font, text_color="#C4B5FD", width=150, anchor="w").grid(row=0, column=2, padx=5, pady=5)
+        ctk.CTkLabel(self.log_list_frame, text="Target", font=header_font, text_color="#C4B5FD", width=200, anchor="w").grid(row=0, column=3, padx=5, pady=5)
         
         for i, log in enumerate(logs, start=1):
             if not isinstance(log, dict):
@@ -520,10 +520,10 @@ class App(ctk.CTk):
             action = log.get("eventType", "Unknown")
             target = log.get("targetId", "Unknown")
             
-            ctk.CTkLabel(self.log_list_frame, text=time_val, text_color="#E8E0FF", width=150, anchor="w").grid(row=i, column=0, padx=5, pady=2)
-            ctk.CTkLabel(self.log_list_frame, text=actor, text_color="#E8E0FF", width=150, anchor="w").grid(row=i, column=1, padx=5, pady=2)
-            ctk.CTkLabel(self.log_list_frame, text=action, text_color="#E8E0FF", width=150, anchor="w").grid(row=i, column=2, padx=5, pady=2)
-            ctk.CTkLabel(self.log_list_frame, text=target, text_color="#E8E0FF", width=200, anchor="w").grid(row=i, column=3, padx=5, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=time_val, text_color="#F5F3FF", width=150, anchor="w").grid(row=i, column=0, padx=5, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=actor, text_color="#F5F3FF", width=150, anchor="w").grid(row=i, column=1, padx=5, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=action, text_color="#F5F3FF", width=150, anchor="w").grid(row=i, column=2, padx=5, pady=2)
+            ctk.CTkLabel(self.log_list_frame, text=target, text_color="#F5F3FF", width=200, anchor="w").grid(row=i, column=3, padx=5, pady=2)
             
         self.log_to_console(f"LOGS > Loaded {len(logs)} audit events.")
 
